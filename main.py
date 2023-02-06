@@ -17,7 +17,7 @@ correct = 0
 current_time = time.time()
 
 
-def get_numbers(len1=25, len2=2, range1=(3, 50)):  # len2 = 5
+def get_numbers(len1=25, len2=5, range1=(3, 50)):  # len2 = 5
     result1 = list(map(str, sample(range(*range1), len1)))
     result2 = []
     while len(result2) < len2:
