@@ -4,6 +4,7 @@ from random import choice, sample
 
 root = Tk()
 root.geometry("1000x458")
+root.title("Цифры")
 
 action_symbols = ["+", "-", "*", "/"]
 button_list = []
@@ -21,8 +22,12 @@ def get_numbers(len1=25, len2=5, range1=(3, 50)):  # len2 = 5
     result1 = list(map(str, sample(range(*range1), len1)))
     result2 = []
     while len(result2) < len2:
-        temp = eval(str(choice(result1)) + choice(action_symbols[:-2]) + str(choice(result1)))
-        if temp not in result2 and temp == int(temp) and temp != 0:
+        num1 = choice(result1)
+        num2 = num1
+        while num2 == num1:
+            num2 = choice(result1)
+        temp = eval(str(num1) + choice(action_symbols) + str(num2))
+        if temp not in result2 and temp == int(temp) and temp <= 500:
             result2.append(int(temp))
 
     return result1, result2
@@ -40,10 +45,9 @@ def reset_expression():
 def select_task():
     global current_task_result
     current_task_result = int(radiobutton_list[selected_task.get()]["text"])
-    print(current_task_result)
 
 
-def confirm():
+def submit():
     global current_time, correct
     to_statistics = [round(time.time() - current_time, 1), selected_task.get()]
     if current_task_result == eval(expression):
@@ -74,6 +78,7 @@ def show_endscreen():
     confirm_button["state"] = "disabled"
     popup = Toplevel()
     popup.protocol("WM_DELETE_WINDOW", root.destroy)
+    popup.title("Результаты")
 
     for key in statistics:  # дичь, индексы и форматирование сток
         values = statistics[key]
@@ -144,7 +149,7 @@ reset_button = Button(root, text="Сброс", font="Calibri 24", command=reset_
 reset_button.place(x=888, y=75)
 
 # confirm button
-confirm_button = Button(root, text="Проверить", font="Calibri 24", command=confirm, state="disabled")
+confirm_button = Button(root, text="Проверить", font="Calibri 24", command=submit, state="disabled")
 confirm_button.place(x=717, y=75)
 
 expression_label = Label(root, text="", bg="#777777", font="Calibri 24", width=17)
@@ -152,7 +157,8 @@ expression_label.place(x=400, y=15)
 
 for index, number in enumerate(task_numbers):
     new_button = Radiobutton(root, text=str(number), variable=selected_task, value=index, font="Calibri 24",
-                             bg="#DDDDDD", width=10, command=select_task)
+                             bg="#DDDDDD", width=10, command=select_task, state="disabled")
+    # state = "disabled" до тех пор, пока выбор вопроса криво работает
     new_button.place(x=index * 201, y=400)
     radiobutton_list.append(new_button)
 current_task_result = int(radiobutton_list[selected_task.get()]["text"])
