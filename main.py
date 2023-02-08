@@ -4,6 +4,7 @@ from random import choice, sample
 
 root = Tk()
 root.geometry("1000x458")
+root.title("Цифры")
 
 action_symbols = ["+", "-", "*", "/"]
 button_list = []
@@ -21,8 +22,12 @@ def get_numbers(len1=25, len2=5, range1=(3, 50)):  # len2 = 5
     result1 = list(map(str, sample(range(*range1), len1)))
     result2 = []
     while len(result2) < len2:
-        temp = eval(str(choice(result1)) + choice(action_symbols[:-2]) + str(choice(result1)))
-        if temp not in result2 and temp == int(temp) and temp != 0:
+        num1 = choice(result1)
+        num2 = num1
+        while num2 == num1:
+            num2 = choice(result1)
+        temp = eval(str(num1) + choice(action_symbols) + str(num2))
+        if temp not in result2 and temp == int(temp) and temp <= 500:
             result2.append(int(temp))
 
     return result1, result2
@@ -40,10 +45,11 @@ def reset_expression():
 def select_task():
     global current_task_result
     current_task_result = int(radiobutton_list[selected_task.get()]["text"])
-    print(current_task_result)
+    if selected_task.get() not in possible_selections:
+        selected_task.set(possible_selections[0])
 
 
-def confirm():
+def submit():
     global current_time, correct
     to_statistics = [round(time.time() - current_time, 1), selected_task.get()]
     if current_task_result == eval(expression):
@@ -58,7 +64,7 @@ def confirm():
     statistics[radiobutton_list[selected_task.get()]["text"]] = to_statistics
     current_time = time.time()
 
-    del possible_selections[selected_task.get() - (len(radiobutton_list) - len(possible_selections))]
+    possible_selections.remove(selected_task.get())
     # (len(radiobutton_list) - len(possible_selections)) сдвиг индексов возможных выборов
 
     if len(possible_selections) == 0:
@@ -74,13 +80,14 @@ def show_endscreen():
     confirm_button["state"] = "disabled"
     popup = Toplevel()
     popup.protocol("WM_DELETE_WINDOW", root.destroy)
+    popup.title("Результаты")
 
     for key in statistics:  # дичь, индексы и форматирование сток
         values = statistics[key]
         text = f'Пример №{values[1] + 1}:\nВремя:{values[0]}\nОтвет:{values[3]}\nПравильный ответ:{values[2]}'
-        Label(popup, text=text, font="Calibri 24", anchor='n').pack(side=TOP, padx=20, pady=25)
+        Label(popup, text=text, font="Calibri 20", anchor='n').pack(side=TOP, padx=20, pady=25)
 
-    Label(popup, text=f'Всего {correct}/{len(radiobutton_list)}', font="Calibri 24", anchor='n').pack(side=TOP, padx=20,
+    Label(popup, text=f'Всего {correct}/{len(radiobutton_list)}', font="Calibri 20", anchor='n').pack(side=TOP, padx=20,
                                                                                                       pady=25)
 
     popup.mainloop()
@@ -128,29 +135,28 @@ class CustomButton:
             self.button["state"] = "disabled"
 
 
-for row in range(5):
+for row in range(5):  # кнопки с цифрами
     for column in range(5):
         x = row * 75 + 5
         y = column * 70 + 5
         index = column * 5 + row
         button_list.append(CustomButton(symbol=buttons_numbers[index], x=x, y=y))
 
-for i in action_symbols:
+for i in action_symbols:  # кнопки действий
     x = action_symbols.index(i) * 75 + 695
     button_list.append(CustomButton(symbol=i, x=x, y=5, is_active=False))
 
-# reset button
-reset_button = Button(root, text="Сброс", font="Calibri 24", command=reset_expression)
+reset_button = Button(root, text="Сброс", font="Calibri 24", command=reset_expression)  # кнопка сброса
 reset_button.place(x=888, y=75)
 
 # confirm button
-confirm_button = Button(root, text="Проверить", font="Calibri 24", command=confirm, state="disabled")
+confirm_button = Button(root, text="Проверить", font="Calibri 24", command=submit, state="disabled")  # кнопка проверки
 confirm_button.place(x=717, y=75)
 
-expression_label = Label(root, text="", bg="#777777", font="Calibri 24", width=17)
+expression_label = Label(root, text="", bg="#777777", font="Calibri 24", width=17)  # окошко примера
 expression_label.place(x=400, y=15)
 
-for index, number in enumerate(task_numbers):
+for index, number in enumerate(task_numbers):  # кнопки выбора вопроса
     new_button = Radiobutton(root, text=str(number), variable=selected_task, value=index, font="Calibri 24",
                              bg="#DDDDDD", width=10, command=select_task)
     new_button.place(x=index * 201, y=400)
