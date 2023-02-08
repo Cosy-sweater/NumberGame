@@ -1,6 +1,19 @@
 from tkinter import *
+# from tkinter import messagebox
 import time
 from random import choice, sample
+
+'''
+settings = Tk()
+settings.title("Настройки")
+settings.geometry("300x200")
+var = IntVar()
+Label(settings, text="Сложность:", font="Calibri 20").place(x=10, y=0)
+Button(settings, text="?", font="Calibri 20", width=4, command=lambda: messagebox.showinfo("Помощь", "текст")).place(x=230, y=0)
+Radiobutton(settings, variable=var, value=0, text="Лёгкая", font="Calibri 20").place(x=25, y=40)
+Radiobutton(settings, variable=var, value=1, text="Сложная", font="Calibri 20").place(x=25, y=80)
+settings.mainloop()
+'''
 
 root = Tk()
 root.geometry("1000x458")
