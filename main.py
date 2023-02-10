@@ -1,34 +1,8 @@
 from tkinter import *
-# from tkinter import messagebox
+from tkinter import messagebox
 import time
 from random import choice, sample
-
-'''
-settings = Tk()
-settings.title("Настройки")
-settings.geometry("300x200")
-var = IntVar()
-Label(settings, text="Сложность:", font="Calibri 20").place(x=10, y=0)
-Button(settings, text="?", font="Calibri 20", width=4, command=lambda: messagebox.showinfo("Помощь", "текст")).place(x=230, y=0)
-Radiobutton(settings, variable=var, value=0, text="Лёгкая", font="Calibri 20").place(x=25, y=40)
-Radiobutton(settings, variable=var, value=1, text="Сложная", font="Calibri 20").place(x=25, y=80)
-settings.mainloop()
-'''
-
-root = Tk()
-root.geometry("1000x458")
-root.title("Цифры")
-
-action_symbols = ["+", "-", "*", "/"]
-button_list = []
-radiobutton_list = []
-selected_task = IntVar()
-expression = ""
-expression_elements = 0
-
-statistics = {}
-correct = 0
-current_time = time.time()
+import sys
 
 
 def get_numbers(len1=25, len2=5, range1=(3, 50)):  # len2 = 5
@@ -105,8 +79,11 @@ def show_endscreen():
 
     popup.mainloop()
 
-
-buttons_numbers, task_numbers = get_numbers()
+def close_settings():
+    if any(map(lambda n: n.get(), checkbutton_vars)):
+        settings.destroy()
+    else:
+        messagebox.showwarning("Предупреждение", "Нужно выбрать хотя бы одно действие")
 
 
 class CustomButton:
@@ -148,6 +125,40 @@ class CustomButton:
             self.button["state"] = "disabled"
 
 
+settings = Tk()
+settings.title("Настройки")
+settings.geometry("300x330")
+settings.protocol("WM_DELETE_WINDOW", sys.exit)
+checkbutton_vars = [IntVar() for i in range(4)]
+some_text = "Отмеченные действия могут использоваться для получения числа для задания\n\n" \
+            "Это не означает, что они будет обязательно использованы"
+Label(settings, text="Действия:", font="Calibri 20").place(x=10, y=0)
+Button(settings, text="?", font="Calibri 20", width=4,
+       command=lambda: messagebox.showinfo("Помощь", some_text)).place(x=230, y=0)
+Checkbutton(settings, text="Сложение", variable=checkbutton_vars[0], font="Calibri 20").place(x=10, y=50)
+Checkbutton(settings, text="Вычетание", variable=checkbutton_vars[1], font="Calibri 20").place(x=10, y=100)
+Checkbutton(settings, text="Умножение", variable=checkbutton_vars[2], font="Calibri 20").place(x=10, y=150)
+Checkbutton(settings, text="Деление", variable=checkbutton_vars[3], font="Calibri 20").place(x=10, y=200)
+Button(settings, text="Ок", font="Calibri 20", width=5, command=close_settings).place(x=10, y=270)
+settings.mainloop()
+
+root = Tk()
+root.geometry("1000x458")
+root.title("Математическая игра")
+
+action_symbols = ["+", "-", "*", "/"]
+button_list = []
+radiobutton_list = []
+selected_task = IntVar()
+expression = ""
+expression_elements = 0
+
+statistics = {}
+correct = 0
+current_time = time.time()
+
+buttons_numbers, task_numbers = get_numbers()
+
 for row in range(5):  # кнопки с цифрами
     for column in range(5):
         x = row * 75 + 5
@@ -155,9 +166,10 @@ for row in range(5):  # кнопки с цифрами
         index = column * 5 + row
         button_list.append(CustomButton(symbol=buttons_numbers[index], x=x, y=y))
 
-for i in action_symbols:  # кнопки действий
-    x = action_symbols.index(i) * 75 + 695
-    button_list.append(CustomButton(symbol=i, x=x, y=5, is_active=False))
+for index, item in enumerate(action_symbols):  # кнопки действий
+    x = action_symbols.index(item) * 75 + 695
+    if checkbutton_vars[index].get():
+        button_list.append(CustomButton(symbol=item, x=x, y=5, is_active=False))
 
 reset_button = Button(root, text="Сброс", font="Calibri 24", command=reset_expression)  # кнопка сброса
 reset_button.place(x=888, y=75)
