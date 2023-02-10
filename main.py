@@ -13,7 +13,10 @@ def get_numbers(len1=25, len2=5, range1=(3, 50)):  # len2 = 5
         num2 = num1
         while num2 == num1:
             num2 = choice(result1)
-        temp = eval(str(num1) + choice(action_symbols) + str(num2))
+        action = choice(action_symbols)
+        while not checkbutton_vars[action_symbols.index(action)].get():
+            action = choice(action_symbols)
+        temp = eval(str(num1) + action + str(num2))
         if temp not in result2 and temp == int(temp) and temp <= 500:
             result2.append(int(temp))
 
@@ -71,13 +74,14 @@ def show_endscreen():
 
     for key in statistics:  # дичь, индексы и форматирование сток
         values = statistics[key]
-        text = f'Пример №{values[1] + 1}:\nВремя:{values[0]}\nОтвет:{values[3]}\nПравильный ответ:{values[2]}'
-        Label(popup, text=text, font="Calibri 20", anchor='n').pack(side=TOP, padx=20, pady=25)
+        text = f'Пример №{values[1] + 1}:\nВремя: {values[0]}\nОтвет: {values[3]}\nПравильный ответ: {values[2]}'
+        Label(popup, text=text, font="Calibri 16", anchor='n').pack(side=TOP, padx=20, pady=25)
 
     Label(popup, text=f'Всего {correct}/{len(radiobutton_list)}', font="Calibri 20", anchor='n').pack(side=TOP, padx=20,
                                                                                                       pady=25)
 
     popup.mainloop()
+
 
 def close_settings():
     if any(map(lambda n: n.get(), checkbutton_vars)):
